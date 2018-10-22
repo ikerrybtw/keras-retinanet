@@ -141,9 +141,20 @@ def compute_gt_annotations(
     max_overlaps = overlaps[np.arange(overlaps.shape[0]), argmax_overlaps_inds]
 
     # assign "dont care" labels
-    positive_indices = max_overlaps >= positive_overlap
-    ignore_indices = (max_overlaps > negative_overlap) & ~positive_indices
-
+    # positive_indices = max_overlaps >= positive_overlap
+    # ignore_indices = (max_overlaps > negative_overlap) & ~positive_indices
+    
+    # add logic to ignore anchors at corners of the image (this won't work though, we need to pass in camera id as well)
+    
+    w, h = 960, 540
+    x_thresh = 330, 200
+    center_x, center_y = w/2, h/2
+    bbox_center_xdist = np.abs((anchors[:,0] + anchors[:,2]) / 2.0 - center_x)
+    bbox_center_ydist = np.abs((anchors[:,1] + anchors[:,3]) / 2.0 - center_y)
+    corners = (bbox_center_xdist>x_thresh) and (bbox_center_ydist>y_thresh)
+    ignore_indices = ((max_overlaps > negative_overlap) and (max_overlaps < positive_overlap)) or corners
+    positive_indices = (max_overlaps >= positive_overlap) and (~ignore_indices)
+    
     return positive_indices, ignore_indices, argmax_overlaps_inds
 
 
