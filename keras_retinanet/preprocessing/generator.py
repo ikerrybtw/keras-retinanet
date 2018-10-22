@@ -264,7 +264,7 @@ class Generator(object):
             anchor_params = parse_anchor_parameters(self.config)
         return anchors_for_shape(image_shape, anchor_params=anchor_params, shapes_callback=self.compute_shapes)
 
-    def compute_targets(self, image_group, annotations_group):
+    def compute_targets(self, image_group, annotations_group, group):
         """ Compute target outputs for the network using images and their annotations.
         """
         # get the max image shape
@@ -275,7 +275,8 @@ class Generator(object):
             anchors,
             image_group,
             annotations_group,
-            self.num_classes()
+            self.num_classes(),
+            group
         )
 
         return list(batches)
@@ -297,7 +298,7 @@ class Generator(object):
         inputs = self.compute_inputs(image_group)
 
         # compute network targets
-        targets = self.compute_targets(image_group, annotations_group)
+        targets = self.compute_targets(image_group, annotations_group, group)
 
         return inputs, targets
 
