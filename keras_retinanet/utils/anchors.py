@@ -55,6 +55,8 @@ def anchor_targets_bbox(
     image_group,
     annotations_group,
     num_classes,
+    group = None,
+    image_names_list = None
     negative_overlap=0.4,
     positive_overlap=0.5
 ):
@@ -92,7 +94,7 @@ def anchor_targets_bbox(
     for index, (image, annotations) in enumerate(zip(image_group, annotations_group)):
         if annotations['bboxes'].shape[0]:
             # obtain indices of gt annotations with the greatest overlap
-            positive_indices, ignore_indices, argmax_overlaps_inds = compute_gt_annotations(anchors, annotations['bboxes'], negative_overlap, positive_overlap)
+            positive_indices, ignore_indices, argmax_overlaps_inds = compute_gt_annotations(anchors, annotations['bboxes'], negative_overlap, positive_overlap, image_names_list[group[index]])
 
             labels_batch[index, ignore_indices, -1]       = -1
             labels_batch[index, positive_indices, -1]     = 1
@@ -120,7 +122,8 @@ def compute_gt_annotations(
     anchors,
     annotations,
     negative_overlap=0.4,
-    positive_overlap=0.5
+    positive_overlap=0.5,
+    image_name = None
 ):
     """ Obtain indices of gt annotations with the greatest overlap.
 
@@ -141,19 +144,37 @@ def compute_gt_annotations(
     max_overlaps = overlaps[np.arange(overlaps.shape[0]), argmax_overlaps_inds]
 
     # assign "dont care" labels
-    # positive_indices = max_overlaps >= positive_overlap
-    # ignore_indices = (max_overlaps > negative_overlap) & ~positive_indices
+    if image_name is None:
+        positive_indices = max_overlaps >= positive_overlap
+        ignore_indices = (max_overlaps > negative_overlap) & ~positive_indices
     
-    # add logic to ignore anchors at corners of the image (this won't work though, we need to pass in camera id as well)
+    # add logic to ignore anchors at corners of the image
     # good thing: this function is only called here, so I may be able to figure out a way
-    w, h = 960, 540
-    x_thresh = 330, 200
-    center_x, center_y = w/2, h/2
-    bbox_center_xdist = np.abs((anchors[:,0] + anchors[:,2]) / 2.0 - center_x)
-    bbox_center_ydist = np.abs((anchors[:,1] + anchors[:,3]) / 2.0 - center_y)
-    corners = (bbox_center_xdist>x_thresh) and (bbox_center_ydist>y_thresh)
-    ignore_indices = ((max_overlaps > negative_overlap) and (max_overlaps < positive_overlap)) or corners
-    positive_indices = (max_overlaps >= positive_overlap) and (~ignore_indices)
+    corner_dict = {} # to be filled
+    else:
+        sensor_name = image_name.split('/')[-2]
+        corner_locs = corner_dict[sensor_name]
+        # w, h = 960, 540
+        # x_thresh = 330, 200
+        # center_x, center_y = w/2, h/2
+        bbox_center_x = (anchors[:,0] + anchors[:,2]) / 2.0
+        bbox_center_y = (anchors[:,1] + anchors[:,3]) / 2.0
+        corners = np.zeros(np.arange(overlaps.shape[0]))
+        for locs in corner_locs:
+            x_thresh, y_thresh, sign_x, sign_y = locs
+            if sign_x == '>':
+                x_cond = bbox_center_x > x_thresh
+            else:
+                x_cond = bbox_center_x <= x_thresh
+            if sign_y == '>':
+                y_cond = bbox_center_y > y_thresh
+            else:
+                y_cond = bbox_center_y <= y_thresh
+            corners = corners or (x_cond and y_cond)
+           
+        # corners = (bbox_center_xdist>x_thresh) and (bbox_center_ydist>y_thresh)
+        ignore_indices = ((max_overlaps > negative_overlap) and (max_overlaps < positive_overlap)) or corners
+        positive_indices = (max_overlaps >= positive_overlap) and (~ignore_indices)
     
     return positive_indices, ignore_indices, argmax_overlaps_inds
 
