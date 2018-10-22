@@ -298,7 +298,10 @@ class Generator(object):
         inputs = self.compute_inputs(image_group)
 
         # compute network targets
-        targets = self.compute_targets(image_group, annotations_group, group)
+        try:
+            targets = self.compute_targets(image_group, annotations_group, group, self.image_names)
+        except:
+            targets = self.compute_targets(image_group, annotations_group)
 
         return inputs, targets
 
