@@ -145,7 +145,7 @@ def compute_gt_annotations(
     # ignore_indices = (max_overlaps > negative_overlap) & ~positive_indices
     
     # add logic to ignore anchors at corners of the image (this won't work though, we need to pass in camera id as well)
-    
+    # good thing: this function is only called here, so I may be able to figure out a way
     w, h = 960, 540
     x_thresh = 330, 200
     center_x, center_y = w/2, h/2
