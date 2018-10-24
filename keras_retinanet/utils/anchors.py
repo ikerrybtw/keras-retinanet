@@ -157,9 +157,10 @@ def compute_gt_annotations(
     # good thing: this function is only called here, so I may be able to figure out a way
     else:
         sensor_name = image_name.split('/')[-2]
+        print(sensor_name)
         if sensor_name in corner_dict:
             corner_locs = corner_dict[sensor_name]
-        else: corner_locs = None
+        else: corner_locs = []
         # w, h = 960, 540
         # x_thresh = 330, 200
         # center_x, center_y = w/2, h/2
