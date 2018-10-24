@@ -165,7 +165,7 @@ def compute_gt_annotations(
         # center_x, center_y = w/2, h/2
         bbox_center_x = (anchors[:,0] + anchors[:,2]) / 2.0
         bbox_center_y = (anchors[:,1] + anchors[:,3]) / 2.0
-        corners = np.zeros(np.arange(overlaps.shape[0]))
+        corners = np.zeros(overlaps.shape[0])
         for locs in corner_locs:
             x_thresh, y_thresh, sign_x, sign_y = locs
             if sign_x == '>':
