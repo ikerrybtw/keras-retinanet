@@ -122,7 +122,7 @@ def compute_gt_annotations(
     anchors,
     annotations,
     negative_overlap=0.4,
-    positive_overlap=0.7,
+    positive_overlap=0.6,
     image_name = None
 ):
     """ Obtain indices of gt annotations with the greatest overlap.
@@ -143,6 +143,11 @@ def compute_gt_annotations(
     argmax_overlaps_inds = np.argmax(overlaps, axis=1)
     max_overlaps = overlaps[np.arange(overlaps.shape[0]), argmax_overlaps_inds]
 
+    corner_dict = {'dd21bbc0-4654-4ebd-95b4-e48e350aa9d7': [(676, 146, '>', '<'), (741, 331, '>', '<')],
+                   'e7cd39ea-e5ca-4437-8490-f133efa6326d': [(198, 212, '<', '<')],
+                   '3dd182d6-27d1-41c5-9c00-eecc91a0f41a': [(684, 119, '>', '<'), (784, 327, '>', '<')]
+                  }
+    
     # assign "dont care" labels
     if image_name is None:
         positive_indices = max_overlaps >= positive_overlap
@@ -150,10 +155,11 @@ def compute_gt_annotations(
     
     # add logic to ignore anchors at corners of the image
     # good thing: this function is only called here, so I may be able to figure out a way
-    corner_dict = {} # to be filled
     else:
         sensor_name = image_name.split('/')[-2]
-        corner_locs = corner_dict[sensor_name]
+        if sensor_name in corner_dict:
+            corner_locs = corner_dict[sensor_name]
+        else: corner_locs = None
         # w, h = 960, 540
         # x_thresh = 330, 200
         # center_x, center_y = w/2, h/2
