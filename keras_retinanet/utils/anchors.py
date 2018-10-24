@@ -177,7 +177,7 @@ def compute_gt_annotations(
                 y_cond = bbox_center_y > y_thresh
             else:
                 y_cond = bbox_center_y <= y_thresh
-            corners = corners || (x_cond & y_cond)
+            corners = corners | (x_cond & y_cond)
            
         # corners = (bbox_center_xdist>x_thresh) and (bbox_center_ydist>y_thresh)
         ignore_indices = ((max_overlaps > negative_overlap) and (max_overlaps < positive_overlap)) or corners
