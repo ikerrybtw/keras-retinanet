@@ -166,7 +166,7 @@ def compute_gt_annotations(
         # center_x, center_y = w/2, h/2
         bbox_center_x = (anchors[:,0] + anchors[:,2]) / 2.0
         bbox_center_y = (anchors[:,1] + anchors[:,3]) / 2.0
-        corners = np.zeros(overlaps.shape[0])
+        corners = np.zeros(overlaps.shape[0], dtype=bool)
         for locs in corner_locs:
             x_thresh, y_thresh, sign_x, sign_y = locs
             if sign_x == '>':
@@ -180,8 +180,8 @@ def compute_gt_annotations(
             corners = corners | (x_cond & y_cond)
            
         # corners = (bbox_center_xdist>x_thresh) and (bbox_center_ydist>y_thresh)
-        ignore_indices = ((max_overlaps > negative_overlap) and (max_overlaps < positive_overlap)) or corners
-        positive_indices = (max_overlaps >= positive_overlap) and (~ignore_indices)
+        ignore_indices = ((max_overlaps > negative_overlap) & (max_overlaps < positive_overlap)) | corners
+        positive_indices = (max_overlaps >= positive_overlap) & (~ignore_indices)
     
     return positive_indices, ignore_indices, argmax_overlaps_inds
 
