@@ -276,7 +276,8 @@ class Generator(object):
             image_group,
             annotations_group,
             self.num_classes(),
-            group
+            group,
+            self.image_names
         )
 
         return list(batches)
@@ -298,10 +299,10 @@ class Generator(object):
         inputs = self.compute_inputs(image_group)
 
         # compute network targets
-        try:
-            targets = self.compute_targets(image_group, annotations_group, group, self.image_names)
-        except:
-            targets = self.compute_targets(image_group, annotations_group)
+        # try:
+        targets = self.compute_targets(image_group, annotations_group, group)
+        # except:
+            #targets = self.compute_targets(image_group, annotations_group)
 
         return inputs, targets
 
