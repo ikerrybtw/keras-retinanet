@@ -56,7 +56,7 @@ def anchor_targets_bbox(
     annotations_group,
     num_classes,
     group = None,
-    image_names_list = None
+    image_names_list = None,
     negative_overlap=0.4,
     positive_overlap=0.5
 ):
