@@ -183,7 +183,7 @@ def compute_gt_annotations(
             corners = corners | (x_cond & y_cond)
            
         # corners = (bbox_center_xdist>x_thresh) and (bbox_center_ydist>y_thresh)
-        ignore_indices = ((max_overlaps > negative_overlap) & (max_overlaps < positive_overlap)) | corners
+        ignore_indices = ((max_overlaps > negative_overlap) & (max_overlaps < positive_overlap)) | corners | ((max_overlaps > positive_overlap) & (second_max_overlaps >= negative_overlap))
         positive_indices = ((max_overlaps >= positive_overlap) & (second_max_overlaps < negative_overlap)) & (~ignore_indices)
     
     return positive_indices, ignore_indices, argmax_overlaps_inds
