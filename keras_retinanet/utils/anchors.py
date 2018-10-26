@@ -58,7 +58,7 @@ def anchor_targets_bbox(
     group = None,
     image_names_list = None,
     negative_overlap=0.4,
-    positive_overlap=0.5
+    positive_overlap=0.6
 ):
     """ Generate anchor targets for bbox detection.
 
@@ -122,7 +122,7 @@ def compute_gt_annotations(
     anchors,
     annotations,
     negative_overlap=0.4,
-    positive_overlap=0.5,
+    positive_overlap=0.6,
     image_name = None
 ):
     """ Obtain indices of gt annotations with the greatest overlap.
@@ -188,8 +188,8 @@ def compute_gt_annotations(
             corners = corners | (x_cond & y_cond)
            
         # corners = (bbox_center_xdist>x_thresh) and (bbox_center_ydist>y_thresh)
-        ignore_indices = ((max_overlaps > negative_overlap) & (max_overlaps < positive_overlap)) | corners | ((max_overlaps > positive_overlap) & (second_max_overlaps >= negative_overlap))
-        positive_indices = ((max_overlaps >= positive_overlap) & (second_max_overlaps < negative_overlap)) & (~ignore_indices)
+        ignore_indices = ((max_overlaps > negative_overlap) & (max_overlaps < positive_overlap)) | corners | ((max_overlaps > positive_overlap) & (second_max_overlaps >= positive_overlap))
+        positive_indices = ((max_overlaps >= positive_overlap) & (second_max_overlaps < positive_overlap)) & (~ignore_indices)
     
     return positive_indices, ignore_indices, argmax_overlaps_inds
 
