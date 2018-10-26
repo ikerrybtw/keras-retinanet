@@ -140,6 +140,7 @@ def compute_gt_annotations(
     """
 
     overlaps = compute_overlap(anchors.astype(np.float64), annotations.astype(np.float64))
+    argmax_overlaps_inds = np.argmax(overlaps, axis=1)
     overlaps.partition((1,2), axis=-1)
     max_overlaps = overlaps[np.arange(overlaps.shape[0]), 0]
     second_max_overlaps = overlaps[np.arange(overlaps.shape[0]), 0]
