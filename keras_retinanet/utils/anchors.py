@@ -140,11 +140,14 @@ def compute_gt_annotations(
     """
 
     overlaps = compute_overlap(anchors.astype(np.float64), annotations.astype(np.float64))
-    argmax_overlaps_inds = np.argmax(overlaps, axis=1)
-    max_overlaps = overlaps[np.arange(overlaps.shape[0]), argmax_overlaps_inds] + 0.0
-    overlaps[:,argmax_overlaps_inds] = 0
-    secondmax_overlaps_inds = np.argmax(overlaps, axis=1)
-    second_max_overlaps = overlaps[np.arange(overlaps.shape[0]), secondmax_overlaps_inds]
+    overlaps.partition((1,2), axis=-1)
+    max_overlaps = overlaps[np.arange(overlaps.shape[0]), 0]
+    second_max_overlaps = overlaps[np.arange(overlaps.shape[0]), 0]
+    # argmax_overlaps_inds = np.argmax(overlaps, axis=1)
+    # max_overlaps = overlaps[np.arange(overlaps.shape[0]), argmax_overlaps_inds]
+    # overlaps[:,argmax_overlaps_inds] = 0
+    # secondmax_overlaps_inds = np.argmax(overlaps[, axis=1)
+    # second_max_overlaps = overlaps[np.arange(overlaps.shape[0]), secondmax_overlaps_inds]
 
     corner_dict = {'dd21bbc0-4654-4ebd-95b4-e48e350aa9d7': [(676, 146, '>', '<'), (741, 331, '>', '<')],
                    'e7cd39ea-e5ca-4437-8490-f133efa6326d': [(198, 212, '<', '<')],
